@@ -1,0 +1,12 @@
+###### Requirements without Version Specifiers ######
+#https://pip.pypa.io/en/stable/reference/pip_install/
+docopt
+flask
+flask-bootstrap
+flask-login
+sqlalchemy
+sqlalchemy-cockroachdb
+psycopg2-binary
+geopy
+python-dotenv
+flask-wtf
