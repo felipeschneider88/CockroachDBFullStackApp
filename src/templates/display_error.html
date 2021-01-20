@@ -1,0 +1,18 @@
+{% extends 'layouts/main.html' %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block app_content %}
+<h2>{{ reason }}</h2>
+<h2>{{ context }}</h2>
+<h4>
+    <ul>
+    {% for source in possible_sources %}
+        <li>{{ source }}</li>
+    {% endfor %}
+    {% for ps in possible_solutions %}
+        <li>{{ ps }}</li>
+    {% endfor %}
+    </ul>
+</h4>
+<p>Additional information: {{ additional_information }}</p>
+<p>Exception text: {{ exception_text }}</p>
+{% endblock %}

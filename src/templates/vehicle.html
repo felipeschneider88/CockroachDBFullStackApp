@@ -1,0 +1,63 @@
+{% extends 'layouts/main.html' %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% set active_page = "vehicle" %}
+
+{% block app_content %}
+
+  <div class="col-4">
+      <div class="vehicle">
+          <div class="map">{{ vehicle.last_location }}|{{ API_KEY }}|{{ vehicle.type }}</div>
+          <div class="content">
+              <div class="row">
+                  <h5>
+                      <bf class="text-capitalize">{{ vehicle.type }}</bf>
+                  </h5>
+              </div>
+              <div class="row desc">
+                  <div>
+                    <div class="label">ID</div> 
+                    <bf class="text-capitalize">{{ vehicle.id }}</bf>
+                  </div>
+              </div>
+              <div class="row desc">
+                  <div>
+                    <div class="label">Longitude</div> 
+                    <bf class="text-capitalize">{{ vehicle.last_longitude }}</bf>
+                  </div>
+                  <div>
+                    <div class="label">Latitude</div> 
+                    <bf class="text-capitalize">{{ vehicle.last_latitude }}</bf>
+                  </div>
+              </div>
+              
+              <div class="row desc">
+                  <div>
+                      <div class="label">Battery</div> 
+                      <bf class="text-capitalize">{{ vehicle.battery }} %</bf>
+                  </div>
+              </div>
+
+              <div class="row start-ride">
+                  <form class="form form-horizontal" method="POST" action="/ride/start/{{ vehicle.id }}">
+                      
+                      {% if vehicle.in_use == False %}
+                          <div class="status active">Available</div>
+                          <fieldset>
+                          {{ wtf.form_field(start_ride_form.submit) }}
+                      {% else %}
+                          <div class="status unavailable">Unavailable</div>
+                          <fieldset  disabled="disabled">
+                      {% endif %}
+
+                      </fieldset>
+                  </form>
+              </div>
+              <div class="row delete-vehicle">
+                <form class="form form-horizontal" method="POST" style="width: 15rem;" action="/vehicle/remove/{{ vehicle.id }}">
+                  {{ wtf.form_field(remove_vehicle_form.submit) }}
+                </form>
+              </div>
+          </div>
+      </div>
+  </div>
+{% endblock %}
