@@ -138,8 +138,7 @@ def remove_vehicle_txn(session, vehicle_id):
     # YOU WILL NEED TO USE THE 'session' OBJECT.
     # YOU MAY FIND THIS LINK IN THE SQLALCHEMY DOCS USEFUL:
     # https://docs.sqlalchemy.org/en/13/orm/session_api.html#sqlalchemy.orm.session.Session.delete
-    session.query(vehicle).filter(Vehicle.id == vehicle_id). \
-                                     filter(Vehicle.in_use == False).delete()
+    session.delete(vehicle)
 
     return True  # Should return True when vehicle is deleted.
 
