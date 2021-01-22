@@ -1,0 +1,39 @@
+{% extends 'layouts/main.html' %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% set active_page = "rides" %}
+
+{% block app_content %}
+  {% for ride in rides %}
+    <div class="container ride">
+        
+        <div class="row"><h5>Vehicle ID: {{ ride.vehicle_id }}</h5></div>
+            
+        <div class="row desc">
+
+            <div>
+                <div class="label">Start time</div>
+                <div>{{ ride.start_ts }}  </div>
+            </div>
+            <div></div>
+            <div>
+                <div class="label">End time</div> 
+                <div>{{ ride.end_ts }}  </div>
+            </div> 
+            {% if ride.end_ts == None %}
+            <div>
+              <div class="status active">Active</div>
+              <form class="form" method="GET" action="/ride/{{ ride.vehicle_id }}">
+                  {{ wtf.form_field(form.submit) }}
+              </form>
+            </div>
+            {% else %}
+              <div>
+                <div class="status unavailable">Inactive</div>
+              </div>
+            {% endif %}
+        </div>
+
+
+    </div>
+  {% endfor %}
+{% endblock %}

@@ -24,7 +24,7 @@ from docopt import docopt
 from flask import (Flask, flash, redirect, render_template,
                    url_for)
 from flask_bootstrap import Bootstrap, WebCDN
-from sqlalchemy.exc import ProgrammingError
+from sqlalchemy.exc import IntegrityError, ProgrammingError
 
 from movr.movr import MovR
 from util.calculations import generate_end_ride_messages
@@ -72,6 +72,7 @@ test_connection(movr.engine)
 # ROUTES
 # Home page
 @app.route('/', methods=['GET'])
+@app.route('/home', methods=['GET'])
 def home_page():
     """Redirects to appropriate default page."""
     return redirect(url_for(_DEFAULT_ROUTE, _external=True))
@@ -102,13 +103,15 @@ def vehicle(vehicle_id):
     """View information for a single vehicle."""
     start_ride_form = StartRideForm()
     remove_vehicle_form = RemoveVehicleForm()
-    this_vehicle = movr.get_vehicle(vehicle_id)
+    this_vehicle, location_history = movr.get_vehicle_and_location_history(
+        vehicle_id, max_locations=_MAX_RECORDS)
     if this_vehicle is None:  # not in database
         flash("Vehicle `{}` not found.".format(vehicle_id))
         return redirect(url_for('vehicles', _external=True))
     return render_template('vehicle.html',
                            title='Vehicle {}'.format(vehicle_id),
                            vehicle=this_vehicle,
+                           locations=location_history,
                            start_ride_form=start_ride_form,
                            remove_vehicle_form=remove_vehicle_form)
 
@@ -132,7 +135,7 @@ def remove_vehicle(vehicle_id):
         return redirect(url_for('vehicle', vehicle_id=vehicle_id,
                                 _external=True))
     elif vehicle_deleted is None:  # Vehicle in use or not in database
-        flash(("Vehicle `{}` not found in database or is currently in use. "
+        flash(("Vehicle `{}` not found in database, or is currently in use. "
                "Cannot delete it.").format(vehicle_id))
         return redirect(url_for('vehicles', _external=True))
 
@@ -180,17 +183,20 @@ def ride(vehicle_id):
                                 _external=True))
 
     if form.validate_on_submit():
-        if movr.end_ride(vehicle_id, form.longitude.data, form.latitude.data,
-                         form.battery.data):
-            vehicle_at_end = movr.get_vehicle(vehicle_id)
-            for message in generate_end_ride_messages(vehicle_at_start,
-                                                      vehicle_at_end):
-                flash(message)
-            return redirect(url_for('vehicle', vehicle_id=vehicle_id,
-                                    _external=True))
-        # else: end_ride didn't work
-        flash("Unable to end ride for vehicle `{id}`.".format(id=vehicle_id))
-        return redirect(url_for('ride', vehicle_id=vehicle_id, _external=True))
+        try:
+            if movr.end_ride(vehicle_id, form.longitude.data, form.latitude.data,
+                             form.battery.data):
+                vehicle_at_end = movr.get_vehicle(vehicle_id)
+                for message in generate_end_ride_messages(vehicle_at_start,
+                                                          vehicle_at_end):
+                    flash(message)
+                return redirect(url_for('vehicle', vehicle_id=vehicle_id,
+                                        _external=True))
+            # else: end_ride didn't work
+            flash("Unable to end ride for vehicle `{id}`.".format(id=vehicle_id))
+            return redirect(url_for('ride', vehicle_id=vehicle_id, _external=True))
+        except ValueError as e:
+            return render_error_page(e, movr)
     return render_template('ride.html',
                            title=('Riding a {}'
                                   ).format(vehicle_at_start["vehicle_type"]),
@@ -203,16 +209,16 @@ def add_vehicle():
     """Add a new vehicle to the fleet."""
     form = VehicleForm()
     if form.validate_on_submit():
-        vehicle_type = form.vehicle_type.data
-        longitude = form.longitude.data
-        latitude = form.latitude.data
-        battery = form.battery.data
-        vehicle_id = movr.add_vehicle(vehicle_type=vehicle_type,
-                                      longitude=longitude,
-                                      latitude=latitude,
-                                      battery=battery)
+        try:
+            new_info = movr.add_vehicle(vehicle_type=form.vehicle_type.data,
+                                        longitude=form.longitude.data,
+                                        latitude=form.latitude.data,
+                                        battery=form.battery.data)
+        except IntegrityError as e:
+            return render_error_page(e, movr)
+        vehicle_id = new_info['vehicle_id']
 
-        # check to ensure that vehicle was added
+        # check to verify that vehicle was added
         new_vehicle = movr.get_vehicle(vehicle_id)
         if new_vehicle is None:  # Insert didn't work
             flash(("Vehicle with id `{}` "

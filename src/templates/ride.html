@@ -4,29 +4,29 @@
 {% block app_content %}
 
 
-        <div class="row"><h5>Vehicle ID: {{ vehicle.id }}</h5></div>
-            
-        <div class="row desc">
+  <div class="row"><h5>Vehicle ID: {{ vehicle.id }}</h5></div>
+      
+  <div class="row desc">
 
-            <div>
-                <div class="label">Start time</div>
-                <div>{{ vehicle.last_checkin }}  </div>
-            </div>
-            <div></div>
-            <div>
-                <div class="label">Longitude</div> 
-                <div>{{ vehicle.last_longitude }}  </div>
-            </div> 
-            <div>
-                <div class="label">Latitude</div> 
-                <div>{{ vehicle.last_latitude }}  </div>
-            </div> 
-            <div>
-                <div class="label">Battery</div> 
-                <div>{{ vehicle.battery }} %</div>
-            </div> 
-        </div>
-        <div class="row desc"><br/></div>
+      <div>
+          <div class="label">Start time</div>
+          <div>{{ vehicle.last_checkin }}  </div>
+      </div>
+      <div></div>
+      <div>
+          <div class="label">Longitude</div> 
+          <div>{{ vehicle.last_longitude }}  </div>
+      </div> 
+      <div>
+          <div class="label">Latitude</div> 
+          <div>{{ vehicle.last_latitude }}  </div>
+      </div> 
+      <div>
+          <div class="label">Battery</div> 
+          <div>{{ vehicle.battery }} %</div>
+      </div> 
+  </div>
+  <div class="row desc"><br/></div>
 
   <div class="row align-items-center">
       <a class="list-group-item">

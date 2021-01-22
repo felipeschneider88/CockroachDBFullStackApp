@@ -10,23 +10,13 @@
           <div class="content">
               <div class="row">
                   <h5>
-                      <bf class="text-capitalize">{{ vehicle.type }}</bf>
+                      <bf class="text-capitalize">{{ vehicle.vehicle_type }}</bf>
                   </h5>
               </div>
               <div class="row desc">
                   <div>
                     <div class="label">ID</div> 
                     <bf class="text-capitalize">{{ vehicle.id }}</bf>
-                  </div>
-              </div>
-              <div class="row desc">
-                  <div>
-                    <div class="label">Longitude</div> 
-                    <bf class="text-capitalize">{{ vehicle.last_longitude }}</bf>
-                  </div>
-                  <div>
-                    <div class="label">Latitude</div> 
-                    <bf class="text-capitalize">{{ vehicle.last_latitude }}</bf>
                   </div>
               </div>
               
@@ -36,6 +26,7 @@
                       <bf class="text-capitalize">{{ vehicle.battery }} %</bf>
                   </div>
               </div>
+
 
               <div class="row start-ride">
                   <form class="form form-horizontal" method="POST" action="/ride/start/{{ vehicle.id }}">
@@ -60,4 +51,27 @@
           </div>
       </div>
   </div>
+  <div>
+      <h3>Location History</h3>
+      {% for location in locations %}
+        <div class="container ride">
+
+          <div class="row timestamp"><h5>Timestamp: {{ location.ts }}</h5></div>
+
+          <div class="row desc">
+              <div>
+                  <div class="label">Longitude</div>
+                  <div>{{ location.longitude }}  </div>
+              </div>
+              <div></div>
+              <div>
+                  <div class="label">Latitude</div> 
+                  <div>{{ location.latitude }}  </div>
+              </div> 
+          </div>
+        </div>
+        <div></div>
+      {% endfor %}
+    </div>
+
 {% endblock %}
