@@ -15,7 +15,7 @@ def start_ride_txn(session, vehicle_id):
     """
     Start a vehicle ride (or continue if the vehicle is already in use).
 
-    Arguments:
+    Arguments:|
         session {.Session} -- The active session for the database connection.
         vehicle_id {String} -- The vehicle's `id` column.
     """
@@ -105,6 +105,8 @@ def add_vehicle_txn(session, vehicle_type, longitude, latitude, battery):
     # YOU WILL NEED TO USE THE `session` OBJECT.
     # YOU MAY FIND THIS LINK IN THE SQLALCHEMY DOCS USEFUL:
     # https://docs.sqlalchemy.org/en/13/orm/session_api.html#sqlalchemy.orm.session.Session.add
+    session.add(new_row)
+
 
     return str(vehicle_id)  # Return the new id.
 
@@ -136,6 +138,8 @@ def remove_vehicle_txn(session, vehicle_id):
     # YOU WILL NEED TO USE THE 'session' OBJECT.
     # YOU MAY FIND THIS LINK IN THE SQLALCHEMY DOCS USEFUL:
     # https://docs.sqlalchemy.org/en/13/orm/session_api.html#sqlalchemy.orm.session.Session.delete
+    session.query(vehicle).filter(Vehicle.id == vehicle_id). \
+                                     filter(Vehicle.in_use == False).delete()
 
     return True  # Should return True when vehicle is deleted.
 
