@@ -182,8 +182,19 @@ def get_vehicle_txn(session, vehicle_id):
     """
     # Find the row
     # SELECT * FROM vehicles WHERE id = <vehicle_id>;
-    vehicle = session.query(Vehicle).filter(Vehicle.id == vehicle_id).first()
+    v = aliased(Vehicle)  # vehicles AS v
+    l = aliased(LocationHistory)  # location_history as l
+    g = find_most_recent_timestamp_subquery(session)
 
+    # SELECT columns
+    vehicle = session.query(v.id, v.in_use, v.vehicle_type, v.battery,
+                            l.longitude, l.latitude, l.ts). \
+                      filter(l.vehicle_id == v.id). \
+                      filter(l.vehicle_id == vehicle_id). \
+                      join(g). \
+                      filter(g.c.vehicle_id == l.vehicle_id). \
+                      filter(g.c.max_ts == l.ts).order_by(v.id). \
+                      first()  # LIMIT 1;
     # Return the row as a dictionary for flask to populate a page.
     if vehicle is None:
         return None

@@ -18,9 +18,10 @@ FROM vehicles;
 SET sql_safe_updates = false;
 --Remove the columns from vehicles table:
 
-ALTER TABLE vehicles DROP COLUMN last_checkin,
-    DROP COLUMN last_longitude,
-    DROP COLUMN last_latitude;
+ALTER TABLE vehicles 
+DROP COLUMN last_checkin,
+DROP COLUMN last_longitude,
+DROP COLUMN last_latitude;
 
 --Add again the safe drop 
 SET sql_safe_updates = true;
